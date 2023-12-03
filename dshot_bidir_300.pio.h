@@ -40,8 +40,8 @@ static const uint16_t dshot_bidir_300_program_instructions[] = {
     0x0075, // 18: jmp    !y, 21                     
     0x0094, // 19: jmp    y--, 20                    
     0x00d2, // 20: jmp    pin, 18                    
-    0xe05f, // 21: set    y, 31                      
-    0x4a01, // 22: in     pins, 1                [10]
+    0xe05e, // 21: set    y, 30                      
+    0x4901, // 22: in     pins, 1                [9] 
     0x0096, // 23: jmp    y--, 22                    
     0x4801, // 24: in     pins, 1                [8] 
     0x8020, // 25: push   block                      
