@@ -1,3 +1,5 @@
+Import("env")
+
 """
 Custom pioasm compiler script for platformio.
 (c) 2022 by Piotr Zapart
@@ -6,11 +8,17 @@ https://gist.github.com/hexeguitar/f4533bc697c956ac1245b6843e2ef438
 from os.path import join
 import glob
 import sys
-Import("env")
+import os
+
+print("RAN PIOASM?")
 
 platform = env.PioPlatform()
-PROJ_SRC = env["PROJECT_INCLUDE_DIR"]
-PIO_FILES = glob.glob(join(PROJ_SRC, '*.pio'), recursive=True)
+PIO_FILES = []
+for root, dirs, files in os.walk(env["PROJECT_INCLUDE_DIR"]):
+    for file in files:
+        if file.endswith(".pio"):
+            PIO_FILES.append(os.path.join(root, file))
+# print("Looking here:", PIO_FILES)
 
 if PIO_FILES:
     print("==============================================")
