@@ -9,6 +9,8 @@
 
 namespace DShot {
   
+
+// todo: Encoder/Decoder should by parent classes, with type/poles/etc protected
 class ESC  {
  public:
   ESC (uint dshot_gpio, PIO pio = pio0, 

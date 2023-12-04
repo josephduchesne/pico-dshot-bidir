@@ -6,6 +6,7 @@
 
 #include "pico_pio_loader/pico_pio_loader.h"
 #include "dshot/pio/dshot_bidir_300.pio.h"
+#include "dshot/pio/dshot_normal_300.pio.h"
 #include "dshot/esc.h"
 
 namespace DShot {
@@ -15,14 +16,27 @@ bool ESC::init() {
   if (pio_sm < 0) {
     return false;
   }
+  const pio_program_t* dshot_program = nullptr;
+  void (*init_dshot_program)(PIO, uint, uint, uint) = nullptr;
+  if (speed == Speed::DS300 && type == Type::Normal) {
+    dshot_program = &dshot_normal_300_program;
+    init_dshot_program = &dshot_normal_300_program_init;
+  } else if (speed == Speed::DS300 && type == Type::Bidir) {
+    dshot_program = &dshot_bidir_300_program;
+    init_dshot_program = &dshot_bidir_300_program_init;
+  } else {
+    // todo: some error about unsupported combos?
+    return false;
+  }
 
-  if (!pio_loader_add_or_get_offset(pio, &dshot_bidir_300_program, &pio_offset)) {
+  if (!pio_loader_add_or_get_offset(pio, dshot_program, &pio_offset)) {
     pio_sm_unclaim(pio, pio_sm);
     pio_sm = -1;
     return false;
   }
 
-  dshot_bidir_300_program_init(pio, pio_sm, pio_offset, dshot_gpio);
+  // call the 
+  (*init_dshot_program)(pio, pio_sm, pio_offset, dshot_gpio);
   pio_sm_set_enabled(pio, pio_sm, true);
   return true;
 }

@@ -1,4 +1,4 @@
-.program dshot_bidir_300
+.program dshot_normal_300
 
 .define public BIT_PERIOD 40
 
@@ -17,22 +17,15 @@
 .define FRAME_DELAY_COUNT 26
 .define FRAME_DELAY_REMAINDER (27 - 5)  // 27 = 859 - 32 * 26
 
-init:
-  pull block
-  mov x, osr
+set pindirs, 1 [31] ; output
 
 start_frame:
-  pull noblock
-  mov x, osr
+  pull block
   out y, 16 ; discard 16 most significant bits
-  set y, FRAME_DELAY_COUNT
-frame_delay_loop:
-  jmp !y check_bit [FRAME_DELAY]
-  jmp y-- frame_delay_loop
-  nop [FRAME_DELAY_REMAINDER]
+
 check_bit:
   jmp !osre start_bit
-  jmp start_frame
+  jmp frame_delay
 start_bit:
   out y, 1
   jmp !y do_zero
@@ -44,21 +37,31 @@ do_zero:
   set pins, 1 [ZERO_HIGH_DELAY]
   set pins, 0 [ZERO_LOW_DELAY]
   jmp check_bit
+  
+; delay a minimum amount before next frame (still not auto-run though)
+frame_delay:
+  set y, FRAME_DELAY_COUNT
+frame_delay_loop:
+  jmp !y check_bit [FRAME_DELAY]
+  jmp y-- frame_delay_loop
+  nop [FRAME_DELAY_REMAINDER]
 
+; Go back to the start (TODO: do this with wrap instead)
+  jmp start_frame
 
 % c-sdk {
-static inline void dshot_bidir_300_program_init(PIO pio, uint sm, uint offset, uint pin) {
-    pio_sm_config c = dshot_bidir_300_program_get_default_config(offset);
+static inline void dshot_normal_300_program_init(PIO pio, uint sm, uint offset, uint pin) {
+    pio_sm_config c = dshot_normal_300_program_get_default_config(offset);
 
     sm_config_set_set_pins(&c, pin, 1);
     pio_gpio_init(pio, pin);
     pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
-
-    sm_config_set_out_shift(&c, false, false, 32);
+  
+    sm_config_set_out_shift(&c, false, false, 32);   // auto-pull disabled
 
     double clocks_per_us = clock_get_hz(clk_sys) / 1000000;
     // 3.333us per bit for dshot300
-    sm_config_set_clkdiv(&c, 3.333 / dshot_bidir_300_BIT_PERIOD * clocks_per_us);
+    sm_config_set_clkdiv(&c, 3.333 / dshot_normal_300_BIT_PERIOD * clocks_per_us);
 
     pio_sm_init(pio, sm, offset, &c);
 }
