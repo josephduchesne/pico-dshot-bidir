@@ -1,3 +1,6 @@
+; Copyright 2023, Connor Douthat
+; Telemetry read_telemetry Copyright 2023, Joseph Duchesne
+
 .program dshot_bidir_300
 
 .define public BIT_PERIOD 40
@@ -11,11 +14,6 @@
 .define ZERO_LOW (BIT_PERIOD - ZERO_HIGH)
 .define ZERO_HIGH_DELAY (ZERO_HIGH - 1)
 .define ZERO_LOW_DELAY (ZERO_LOW - 5)
-
-// 8kHz DShot300 -> 1500 frame period -> 1500 - (BIT_PERIOD * 16 + 1) = 859 delay
-.define FRAME_DELAY (32 - 2)
-.define FRAME_DELAY_COUNT 26
-.define FRAME_DELAY_REMAINDER (27 - 5)  // 27 = 859 - 32 * 26
 
 start_frame:
 	set pindirs, 1 [31] ; output

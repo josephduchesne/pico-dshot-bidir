@@ -10,22 +10,13 @@
 #include <Arduino.h>
 #include "dshot/esc.h"
 
-int led = LED_BUILTIN; // the PWM pin the LED is attached to
-
 // todo: move pole pair to 2nd argument
 DShot::ESC dshot(6, pio0, DShot::Type::Bidir, DShot::Speed::DS300, 10);
 
-// the setup routine runs once when you press reset:
 void setup() {
-  // declare pin to be an output:
-  pinMode(led, OUTPUT);
   Serial.begin(921600);
 
-  delay(100);
-
-  // gpio_disable_pulls(27);
   dshot.init();
-  
 }
 
 // the loop routine runs over and over again forever:

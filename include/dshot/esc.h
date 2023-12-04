@@ -1,3 +1,15 @@
+/**
+ * @file esc.h
+ * @author Joseph Duchesne (josephgeek@gmail.com)
+ * @author Connor Douthat
+ * @brief 
+ * @version 0.1
+ * @date 2023-12-04
+ * 
+ * @copyright Copyright (c) 2023 Connor Douthat
+ * 
+ */
+
 #pragma once
 
 #include <stdint.h>

@@ -19,8 +19,6 @@ namespace DShot {
     static constexpr uint8_t DSHOT_EXT_TELEMETRY_VOLTAGE = 0x04;
     static constexpr uint8_t DSHOT_EXT_TELEMETRY_CURRENT = 0x06;
 
-
-
     enum class Speed {
         DS150 = 0,
         DS300 = 1,
@@ -31,14 +29,6 @@ namespace DShot {
     enum class Type {
         Normal = 0,
         Bidir = 1
-    };
-
-    static constexpr const bool SupportedTypes[][2] = { 
-        /* Normal,  Bidir */
-        { true, false },  /* DS150  */
-        { true, true },   /* DS300  */
-        { true, true },   /* DS600  */
-        { false, false }, /* DS1200 */
     };
 
     typedef struct Telemetry{

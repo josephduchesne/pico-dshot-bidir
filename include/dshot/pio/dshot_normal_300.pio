@@ -1,3 +1,6 @@
+; Copyright 2023, Connor Douthat
+; Modified for this library by Joseph Duchesne
+
 .program dshot_normal_300
 
 .define public BIT_PERIOD 40
