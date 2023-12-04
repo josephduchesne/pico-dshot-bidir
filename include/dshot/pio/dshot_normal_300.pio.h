@@ -13,7 +13,7 @@
 // ---------------- //
 
 #define dshot_normal_300_wrap_target 0
-#define dshot_normal_300_wrap 17
+#define dshot_normal_300_wrap 16
 
 #define dshot_normal_300_BIT_PERIOD 40
 
@@ -23,7 +23,7 @@ static const uint16_t dshot_normal_300_program_instructions[] = {
     0x80a0, //  1: pull   block                      
     0x6050, //  2: out    y, 16                      
     0x00e5, //  3: jmp    !osre, 5                   
-    0x000d, //  4: jmp    13                         
+    0x0001, //  4: jmp    1                          
     0x6041, //  5: out    y, 1                       
     0x006a, //  6: jmp    !y, 10                     
     0xfd01, //  7: set    pins, 1                [29]
@@ -33,17 +33,16 @@ static const uint16_t dshot_normal_300_program_instructions[] = {
     0xf400, // 11: set    pins, 0                [20]
     0x0003, // 12: jmp    3                          
     0xe05a, // 13: set    y, 26                      
-    0x1e63, // 14: jmp    !y, 3                  [30]
-    0x008e, // 15: jmp    y--, 14                    
-    0xb642, // 16: nop                           [22]
-    0x0001, // 17: jmp    1                          
+    0x1e8e, // 14: jmp    y--, 14                [30]
+    0xb642, // 15: nop                           [22]
+    0x0001, // 16: jmp    1                          
             //     .wrap
 };
 
 #if !PICO_NO_HARDWARE
 static const struct pio_program dshot_normal_300_program = {
     .instructions = dshot_normal_300_program_instructions,
-    .length = 18,
+    .length = 17,
     .origin = -1,
 };
 

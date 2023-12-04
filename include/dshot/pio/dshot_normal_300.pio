@@ -25,10 +25,9 @@ set pindirs, 1 [31] ; output
 start_frame:
   pull block
   out y, 16 ; discard 16 most significant bits
-
 check_bit:
   jmp !osre start_bit
-  jmp frame_delay
+  jmp start_frame
 start_bit:
   out y, 1
   jmp !y do_zero
@@ -45,8 +44,7 @@ do_zero:
 frame_delay:
   set y, FRAME_DELAY_COUNT
 frame_delay_loop:
-  jmp !y check_bit [FRAME_DELAY]
-  jmp y-- frame_delay_loop
+  jmp y-- frame_delay_loop [FRAME_DELAY]
   nop [FRAME_DELAY_REMAINDER]
 
 ; Go back to the start (TODO: do this with wrap instead)
