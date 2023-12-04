@@ -6,7 +6,7 @@
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
 
-#include "pico_pio_loader.h"
+#include "pico_pio_loader/pico_pio_loader.h"
 
 #include "dshot_bidir_300.pio.h"
 

@@ -1,0 +1,45 @@
+.program dshot_bidir_300
+
+	set pins, 1 [31]  ; output pin should always be high when not sending data for bidir dshot
+main_loop:	
+    set pindirs, 1 [31] ; set pin to output 
+    ; auto-pull enabled
+	pull block ; load 32 bit value into OSR from input fifo, block if no data
+    out x, 16 [31] ; load and discard 16 MSB?
+	set y, 15 [31] ; y is our loop counter, and we're sending 16 bits
+output_loop:	
+	out x, 1  ; grab one byte from OSR, store in x
+	jmp !x, emit_0   ; if X==0, go to emit_0
+	; fall through to JMP emit_1          ; otherwise, go to emit_1
+
+emit_1:	
+	set pins, 0 [23]  ; 0 for high time, since bidir dshot is inverted, and delay 12 cycles
+	set pins, 1 [4]  ; 1 for low time, since bidir dshot is inverted
+	
+	jmp y--, output_loop ; go to output next bit, if we have one y>0
+	jmp main_loop  ; otherwise we're done outputting and need to delay before read
+	
+emit_0:	
+	set pins, 0 [11]  ; 0 for high time, since bidir dshot is inverted, and delay 6 cycles
+	set pins, 1 [16]; 1 for low time, since bidir dshot is inverted, and delay 10 cycles -3
+	
+	jmp y--, output_loop ; go to output next bit, if we have one y>0
+	jmp main_loop  ; otherwise we're done outputting and need to delay before read
+
+
+% c-sdk {
+static inline void dshot_bidir_300_program_init(PIO pio, uint sm, uint offset, uint pin) {
+    pio_sm_config c = dshot_bidir_300_program_get_default_config(offset);
+    sm_config_set_out_pins(&c, pin, 1);
+    sm_config_set_in_pins(&c, pin);
+    sm_config_set_set_pins(&c, pin, 1);
+    // hw_set_bits(&pio->input_sync_bypass, 1u << pin);  // more stable output for some reason
+    pio_gpio_init(pio, pin);
+    gpio_set_pulls(pin, true, true);
+    sm_config_set_out_shift(&c, false, true, 32);   // auto-pull enabled
+    sm_config_set_in_shift(&c, false, false, 32);
+    // currently assumes 133Mhz system clock
+    sm_config_set_clkdiv(&c, 14);
+    pio_sm_init(pio, sm, offset, &c);
+}
+%}
