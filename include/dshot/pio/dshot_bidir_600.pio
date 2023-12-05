@@ -1,0 +1,100 @@
+; Copyright 2023, Connor Douthat
+; Telemetry read_telemetry Copyright 2023, Joseph Duchesne
+
+.program dshot_bidir_600
+
+.define public BIT_PERIOD 40
+
+.define ONE_HIGH 30
+.define ONE_LOW (BIT_PERIOD - ONE_HIGH)
+.define ONE_HIGH_DELAY (ONE_HIGH - 1)
+.define ONE_LOW_DELAY (ONE_LOW - 5)
+
+.define ZERO_HIGH 15
+.define ZERO_LOW (BIT_PERIOD - ZERO_HIGH)
+.define ZERO_HIGH_DELAY (ZERO_HIGH - 1)
+.define ZERO_LOW_DELAY (ZERO_LOW - 5)
+
+start_frame:
+	set pindirs, 1 [31] ; output
+  set pins, 1  [31] ; high for bidir
+  pull block
+  ; mov x, osr
+  out y, 16 ; discard 16 most significant bits
+
+check_bit:
+  jmp !osre start_bit
+  jmp read_delay
+start_bit:
+  out y, 1
+  jmp !y do_zero
+do_one:
+  set pins, 0 [ONE_HIGH_DELAY]
+  set pins, 1 [ONE_LOW_DELAY]
+  jmp check_bit
+do_zero:
+  set pins, 0 [ZERO_HIGH_DELAY]
+  set pins, 1 [ZERO_LOW_DELAY]
+  jmp check_bit
+  
+; wait for low up to around 35us (blheli_32 seems a little slow with telemetry at Dshot600, coming in after ~33us)
+; nominal wait is 720 cycles, but we'll hang around for at least 840 (26 loops) + initial delay
+read_delay:   ; delay for a bit less than 30us before read, or 360 cycles
+  ; set pins, 1     ; set output back to high
+	set y, 21  ; set loop count to 21, resulting in 22 loops, leaving 16 to 136 cycles before data
+delay_before_read_loop:	
+	jmp y--, delay_before_read_loop [31] ; delay+decriment until X is empty
+	; set pins, 0
+	set pindirs, 0
+; now wait for a 0 on the pin, marking the start of the telemetry data (if there is one)
+  set y, 31  ; wait up to 32 loops (5x32=160 cycles)
+; wait for the read to timeout or the pin to go low
+wait_for_low:  ; 21 bit GCR telemetry must start with a low pulse
+  nop [1]  ; inflate wait cycle time to 5 cycles total (nop, nop, jmp, jmp, jmp)
+  jmp !y, read_telemetry  ; break loop if pin is never set
+  jmp y--, keep_waiting   ; this is just y--, but there's no other decriment operation
+keep_waiting:
+  jmp pin wait_for_low   ; then fall through on a low pin
+
+read_telemetry:	
+	set y, 30  ; loop 31 times (last read is outside loop)
+read_first32:	
+	; input shift register is all 0s and cleared every PUSH, so no need to set it up
+	in pins, 1 [9]  ; read a byte into the input shift register, shifting it left, and delaying 11-1 in - 1 jmp=9 cycles
+	jmp y--, read_first32   ; read next bit (if we're still reading bits)
+	
+  in pins, 1 [8]  ; read final bite, delaying 11 total (in + 8 + push + set)
+	push  ; emit the input shift register containing the first 32 samples, clearing the input shift register
+	
+	set y, 31  ; bit count for remaining 32 samples
+read_next32:	
+	in pins, 1 [10]  ; read a byte into the input shift register, shifting it left
+	jmp y--, read_next32   ; read next bit (if we're still reading bits)
+	
+	push  ; emit the input shift register containing the second 32 samples, clearing the input shift register
+	jmp start_frame  ; and go back to the main loop to wait for the next output value
+  ; todo: probably could just use wrap loop to return to start, saving an instruction here
+
+
+% c-sdk {
+static inline void dshot_bidir_600_program_init(PIO pio, uint sm, uint offset, uint pin) {
+    pio_sm_config c = dshot_bidir_600_program_get_default_config(offset);
+
+    sm_config_set_set_pins(&c, pin, 1);
+    sm_config_set_in_pins(&c, pin);
+    sm_config_set_jmp_pin (&c, pin);
+    pio_gpio_init(pio, pin);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+    gpio_set_pulls(pin, true, false);  // up, down
+
+  
+    sm_config_set_out_shift(&c, false, false, 32);   // auto-pull enabled
+    sm_config_set_in_shift(&c, false, false, 32);
+
+    double clocks_per_us = clock_get_hz(clk_sys) / 1000000;
+    // 1.667us per bit for dshot600
+    sm_config_set_clkdiv(&c, 1.667 / dshot_bidir_600_BIT_PERIOD * clocks_per_us);
+
+    pio_sm_init(pio, sm, offset, &c);
+}
+%}

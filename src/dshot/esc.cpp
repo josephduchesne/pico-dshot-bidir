@@ -17,8 +17,12 @@
 #include "hardware/pio.h"
 
 #include "pico_pio_loader/pico_pio_loader.h"
-#include "dshot/pio/dshot_bidir_300.pio.h"
+#include "dshot/pio/dshot_normal_150.pio.h"
 #include "dshot/pio/dshot_normal_300.pio.h"
+#include "dshot/pio/dshot_bidir_300.pio.h"
+#include "dshot/pio/dshot_normal_600.pio.h"
+#include "dshot/pio/dshot_bidir_600.pio.h"
+#include "dshot/pio/dshot_normal_1200.pio.h"
 #include "dshot/esc.h"
 
 namespace DShot {
@@ -30,12 +34,31 @@ bool ESC::init() {
   }
   const pio_program_t* dshot_program = nullptr;
   void (*init_dshot_program)(PIO, uint, uint, uint) = nullptr;
-  if (speed == Speed::DS300 && type == Type::Normal) {
+
+  if (speed == Speed::DS150 && type == Type::Normal) {
+    dshot_program = &dshot_normal_150_program;
+    init_dshot_program = &dshot_normal_150_program_init;
+
+  } else if (speed == Speed::DS300 && type == Type::Normal) {
     dshot_program = &dshot_normal_300_program;
     init_dshot_program = &dshot_normal_300_program_init;
+
   } else if (speed == Speed::DS300 && type == Type::Bidir) {
     dshot_program = &dshot_bidir_300_program;
     init_dshot_program = &dshot_bidir_300_program_init;
+    
+  } else if (speed == Speed::DS600 && type == Type::Normal) {
+    dshot_program = &dshot_normal_600_program;
+    init_dshot_program = &dshot_normal_600_program_init;
+    
+  } else if (speed == Speed::DS600 && type == Type::Bidir) {
+    dshot_program = &dshot_bidir_600_program;
+    init_dshot_program = &dshot_bidir_600_program_init;
+    
+  } else if (speed == Speed::DS1200 && type == Type::Normal) {
+    dshot_program = &dshot_normal_1200_program;
+    init_dshot_program = &dshot_normal_1200_program_init;
+    
   } else {
     // todo: some error about unsupported combos?
     return false;

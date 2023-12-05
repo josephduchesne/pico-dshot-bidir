@@ -1,21 +1,21 @@
-/*
-  Fade
-
-  This example shows how to fade the onboard Raspberry Pi Pico LED
-
-  This example code is in the public domain.
-
-  http://www.arduino.cc/en/Tutorial/Fade
-*/
+/**
+ * @file example-main.cpp
+ * @author Joseph Duchesne <josephgeek@gmail.com
+ * @brief 
+ * @version 0.9
+ * @date 2023-12-04
+ * 
+ * @copyright Copyright (c) Joseph Duchesne 2023
+ * 
+ */
 #include <Arduino.h>
 #include "dshot/esc.h"
 
 // todo: move pole pair to 2nd argument
-DShot::ESC dshot(6, pio0, DShot::Type::Bidir, DShot::Speed::DS300, 10);
+DShot::ESC dshot(6, pio0, DShot::Type::Bidir, DShot::Speed::DS600, 10);
 
 void setup() {
   Serial.begin(921600);
-
   dshot.init();
 }
 
@@ -24,7 +24,6 @@ void setup() {
 DShot::Telemetry telemetry = {0};
 void loop() {
   
-  
   //if (init_result) Serial.println("Dshot init success");
   //else Serial.println("DShot init failed");
   delay(2);
@@ -32,7 +31,7 @@ void loop() {
   //print_bin(dshot.setCommand(1046));
   if (millis()< 3000) dshot.setCommand(0);  // 1046 is the example command
   else if (millis() < 4000) dshot.setCommand(13);  // extended telemetry enable
-  else dshot.setCommand(1500); // https://github.com/betaflight/betaflight/issues/2879
+  else dshot.setThrottle(0.25); // https://github.com/betaflight/betaflight/issues/2879
   delay(1);  // wait for dshot PIO to be done
   uint64_t raw_telemetry;
   if (dshot.getRawTelemetry(raw_telemetry)) {

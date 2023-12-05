@@ -9,15 +9,15 @@
 #endif
 
 // ---------------- //
-// dshot_normal_300 //
+// dshot_normal_150 //
 // ---------------- //
 
-#define dshot_normal_300_wrap_target 0
-#define dshot_normal_300_wrap 16
+#define dshot_normal_150_wrap_target 0
+#define dshot_normal_150_wrap 16
 
-#define dshot_normal_300_BIT_PERIOD 40
+#define dshot_normal_150_BIT_PERIOD 40
 
-static const uint16_t dshot_normal_300_program_instructions[] = {
+static const uint16_t dshot_normal_150_program_instructions[] = {
             //     .wrap_target
     0xff81, //  0: set    pindirs, 1             [31]
     0x9fa0, //  1: pull   block                  [31]
@@ -40,27 +40,27 @@ static const uint16_t dshot_normal_300_program_instructions[] = {
 };
 
 #if !PICO_NO_HARDWARE
-static const struct pio_program dshot_normal_300_program = {
-    .instructions = dshot_normal_300_program_instructions,
+static const struct pio_program dshot_normal_150_program = {
+    .instructions = dshot_normal_150_program_instructions,
     .length = 17,
     .origin = -1,
 };
 
-static inline pio_sm_config dshot_normal_300_program_get_default_config(uint offset) {
+static inline pio_sm_config dshot_normal_150_program_get_default_config(uint offset) {
     pio_sm_config c = pio_get_default_sm_config();
-    sm_config_set_wrap(&c, offset + dshot_normal_300_wrap_target, offset + dshot_normal_300_wrap);
+    sm_config_set_wrap(&c, offset + dshot_normal_150_wrap_target, offset + dshot_normal_150_wrap);
     return c;
 }
 
-static inline void dshot_normal_300_program_init(PIO pio, uint sm, uint offset, uint pin) {
-    pio_sm_config c = dshot_normal_300_program_get_default_config(offset);
+static inline void dshot_normal_150_program_init(PIO pio, uint sm, uint offset, uint pin) {
+    pio_sm_config c = dshot_normal_150_program_get_default_config(offset);
     sm_config_set_set_pins(&c, pin, 1);
     pio_gpio_init(pio, pin);
     pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
     sm_config_set_out_shift(&c, false, false, 32);   // auto-pull disabled
     double clocks_per_us = clock_get_hz(clk_sys) / 1000000;
-    // 3.333us per bit for dshot300
-    sm_config_set_clkdiv(&c, 3.333 / dshot_normal_300_BIT_PERIOD * clocks_per_us);
+    // 6.666us per bit for dshot150
+    sm_config_set_clkdiv(&c, 6.666 / dshot_normal_150_BIT_PERIOD * clocks_per_us);
     pio_sm_init(pio, sm, offset, &c);
 }
 

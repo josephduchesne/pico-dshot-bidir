@@ -1,7 +1,7 @@
 ; Copyright 2023, Connor Douthat
 ; Modified for this library by Joseph Duchesne
 
-.program dshot_normal_300
+.program dshot_normal_150
 
 .define public BIT_PERIOD 40
 
@@ -15,7 +15,7 @@
 .define ZERO_HIGH_DELAY (ZERO_HIGH - 1)
 .define ZERO_LOW_DELAY (ZERO_LOW - 5)
 
-// 8kHz DShot300 -> 1500 frame period -> 1500 - (BIT_PERIOD * 16 + 1) = 859 delay
+// 4kHz DShot150 -> 1500 frame period -> 1500 - (BIT_PERIOD * 16 + 1) = 859 delay
 .define FRAME_DELAY (32 - 2)
 .define FRAME_DELAY_COUNT 26
 .define FRAME_DELAY_REMAINDER (27 - 5)  // 27 = 859 - 32 * 26
@@ -23,7 +23,7 @@
 set pindirs, 1 [31] ; output
 
 start_frame:
-  pull block [31]  ; seems unstable without the delay :/
+  pull block [31]
   out y, 16 ; discard 16 most significant bits
 check_bit:
   jmp !osre start_bit
@@ -51,8 +51,8 @@ frame_delay_loop:
   jmp start_frame
 
 % c-sdk {
-static inline void dshot_normal_300_program_init(PIO pio, uint sm, uint offset, uint pin) {
-    pio_sm_config c = dshot_normal_300_program_get_default_config(offset);
+static inline void dshot_normal_150_program_init(PIO pio, uint sm, uint offset, uint pin) {
+    pio_sm_config c = dshot_normal_150_program_get_default_config(offset);
 
     sm_config_set_set_pins(&c, pin, 1);
     pio_gpio_init(pio, pin);
@@ -61,8 +61,8 @@ static inline void dshot_normal_300_program_init(PIO pio, uint sm, uint offset, 
     sm_config_set_out_shift(&c, false, false, 32);   // auto-pull disabled
 
     double clocks_per_us = clock_get_hz(clk_sys) / 1000000;
-    // 3.333us per bit for dshot300
-    sm_config_set_clkdiv(&c, 3.333 / dshot_normal_300_BIT_PERIOD * clocks_per_us);
+    // 6.666us per bit for dshot150
+    sm_config_set_clkdiv(&c, 6.666 / dshot_normal_150_BIT_PERIOD * clocks_per_us);
 
     pio_sm_init(pio, sm, offset, &c);
 }

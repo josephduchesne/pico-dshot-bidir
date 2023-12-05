@@ -1,7 +1,7 @@
 ; Copyright 2023, Connor Douthat
 ; Modified for this library by Joseph Duchesne
 
-.program dshot_normal_300
+.program dshot_normal_600
 
 .define public BIT_PERIOD 40
 
@@ -15,10 +15,10 @@
 .define ZERO_HIGH_DELAY (ZERO_HIGH - 1)
 .define ZERO_LOW_DELAY (ZERO_LOW - 5)
 
-// 8kHz DShot300 -> 1500 frame period -> 1500 - (BIT_PERIOD * 16 + 1) = 859 delay
+// 8kHz DShot600 -> 3000 frame period -> 3000 - (BIT_PERIOD * 16 + 1) = 2359 delay (? todo: confim?)
 .define FRAME_DELAY (32 - 2)
-.define FRAME_DELAY_COUNT 26
-.define FRAME_DELAY_REMAINDER (27 - 5)  // 27 = 859 - 32 * 26
+.define FRAME_DELAY_COUNT 24
+.define FRAME_DELAY_REMAINDER (23 - 5)  // 27 = 2359 - 96 * 24 - 32 ((nop, nop, jmp) + noop nop)
 
 set pindirs, 1 [31] ; output
 
@@ -43,16 +43,19 @@ do_zero:
 ; delay a minimum amount before next frame (still not auto-run though)
 frame_delay:
   set y, FRAME_DELAY_COUNT
-frame_delay_loop:
+frame_delay_loop:  ; 96 cycles per loop
+  nop [31]
+  nop [31]
   jmp y-- frame_delay_loop [FRAME_DELAY]
+  nop [31]
   nop [FRAME_DELAY_REMAINDER]
 
 ; Go back to the start (TODO: do this with wrap instead)
   jmp start_frame
 
 % c-sdk {
-static inline void dshot_normal_300_program_init(PIO pio, uint sm, uint offset, uint pin) {
-    pio_sm_config c = dshot_normal_300_program_get_default_config(offset);
+static inline void dshot_normal_600_program_init(PIO pio, uint sm, uint offset, uint pin) {
+    pio_sm_config c = dshot_normal_600_program_get_default_config(offset);
 
     sm_config_set_set_pins(&c, pin, 1);
     pio_gpio_init(pio, pin);
@@ -61,8 +64,8 @@ static inline void dshot_normal_300_program_init(PIO pio, uint sm, uint offset, 
     sm_config_set_out_shift(&c, false, false, 32);   // auto-pull disabled
 
     double clocks_per_us = clock_get_hz(clk_sys) / 1000000;
-    // 3.333us per bit for dshot300
-    sm_config_set_clkdiv(&c, 3.333 / dshot_normal_300_BIT_PERIOD * clocks_per_us);
+    // 1.67us per bit for dshot600
+    sm_config_set_clkdiv(&c, 1.667 / dshot_normal_600_BIT_PERIOD * clocks_per_us);
 
     pio_sm_init(pio, sm, offset, &c);
 }

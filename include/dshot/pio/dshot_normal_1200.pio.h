@@ -8,16 +8,16 @@
 #include "hardware/pio.h"
 #endif
 
-// ---------------- //
-// dshot_normal_300 //
-// ---------------- //
+// ----------------- //
+// dshot_normal_1200 //
+// ----------------- //
 
-#define dshot_normal_300_wrap_target 0
-#define dshot_normal_300_wrap 16
+#define dshot_normal_1200_wrap_target 0
+#define dshot_normal_1200_wrap 19
 
-#define dshot_normal_300_BIT_PERIOD 40
+#define dshot_normal_1200_BIT_PERIOD 40
 
-static const uint16_t dshot_normal_300_program_instructions[] = {
+static const uint16_t dshot_normal_1200_program_instructions[] = {
             //     .wrap_target
     0xff81, //  0: set    pindirs, 1             [31]
     0x9fa0, //  1: pull   block                  [31]
@@ -32,35 +32,39 @@ static const uint16_t dshot_normal_300_program_instructions[] = {
     0xee01, // 10: set    pins, 1                [14]
     0xf400, // 11: set    pins, 0                [20]
     0x0003, // 12: jmp    3                          
-    0xe05a, // 13: set    y, 26                      
-    0x1e8e, // 14: jmp    y--, 14                [30]
-    0xb642, // 15: nop                           [22]
-    0x0001, // 16: jmp    1                          
+    0xe058, // 13: set    y, 24                      
+    0xbf42, // 14: nop                           [31]
+    0xbf42, // 15: nop                           [31]
+    0x1e8e, // 16: jmp    y--, 14                [30]
+    0xbf42, // 17: nop                           [31]
+    0xb242, // 18: nop                           [18]
+    0x0001, // 19: jmp    1                          
             //     .wrap
 };
 
 #if !PICO_NO_HARDWARE
-static const struct pio_program dshot_normal_300_program = {
-    .instructions = dshot_normal_300_program_instructions,
-    .length = 17,
+static const struct pio_program dshot_normal_1200_program = {
+    .instructions = dshot_normal_1200_program_instructions,
+    .length = 20,
     .origin = -1,
 };
 
-static inline pio_sm_config dshot_normal_300_program_get_default_config(uint offset) {
+static inline pio_sm_config dshot_normal_1200_program_get_default_config(uint offset) {
     pio_sm_config c = pio_get_default_sm_config();
-    sm_config_set_wrap(&c, offset + dshot_normal_300_wrap_target, offset + dshot_normal_300_wrap);
+    sm_config_set_wrap(&c, offset + dshot_normal_1200_wrap_target, offset + dshot_normal_1200_wrap);
     return c;
 }
 
-static inline void dshot_normal_300_program_init(PIO pio, uint sm, uint offset, uint pin) {
-    pio_sm_config c = dshot_normal_300_program_get_default_config(offset);
+static inline void dshot_normal_1200_program_init(PIO pio, uint sm, uint offset, uint pin) {
+    pio_sm_config c = dshot_normal_1200_program_get_default_config(offset);
     sm_config_set_set_pins(&c, pin, 1);
     pio_gpio_init(pio, pin);
     pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
     sm_config_set_out_shift(&c, false, false, 32);   // auto-pull disabled
     double clocks_per_us = clock_get_hz(clk_sys) / 1000000;
-    // 3.333us per bit for dshot300
-    sm_config_set_clkdiv(&c, 3.333 / dshot_normal_300_BIT_PERIOD * clocks_per_us);
+    // 0.8333us per bit for dshot1200
+    // Not sure how well this will work at 1200 (clock divider = 2.76)
+    sm_config_set_clkdiv(&c, 0.8333 / dshot_normal_1200_BIT_PERIOD * clocks_per_us);
     pio_sm_init(pio, sm, offset, &c);
 }
 
