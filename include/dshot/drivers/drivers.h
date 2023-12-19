@@ -14,6 +14,8 @@ inline constexpr uint16_t MAX_OBSERVERS = 1;
 
 // typedef etl::observer<const DShot::TelemetryField&> Telemetry_Observer;
 
+typedef int TelemetryField;  // temporary
+
 class Base // : public etl::observable<Telemetry_Observer, MAX_OBSERVERS>
 {
 public:
