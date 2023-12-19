@@ -18,6 +18,7 @@
 #include "dshot/data.h"
 #include "dshot/encoder.h"
 #include "dshot/decoder.h"
+#include "drivers/pio_sm.h"
 
 namespace DShot {
   
