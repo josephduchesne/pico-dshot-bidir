@@ -5,19 +5,19 @@
 
 namespace DShot::Drivers {
 
-class Pio : public Base
+class Pio_SM : public Base
 {
 public:
 
     /**
-     * @brief Construct a new DShot::Drivers::Pio object
+     * @brief Construct a new DShot::Drivers::Pio_SM object
      * 
      * @param dshot_gpio 
      * @param pio 
      * @param type 
      * @param speed 
      */
-    Pio(uint dshot_gpio, PIO pio = pio0, Type type = Type::Bidir, Speed speed = Speed::DS300)
+    Pio_SM(uint dshot_gpio, PIO pio = pio0, Type type = Type::Bidir, Speed speed = Speed::DS300)
     : dshot_gpio(dshot_gpio), pio(pio), speed(speed), type(type)
     {};
 
