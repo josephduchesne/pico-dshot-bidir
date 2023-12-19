@@ -14,8 +14,6 @@ inline constexpr uint16_t MAX_OBSERVERS = 1;
 
 // typedef etl::observer<const DShot::TelemetryField&> Telemetry_Observer;
 
-typedef int TelemetryField;  // temporary
-
 class Base // : public etl::observable<Telemetry_Observer, MAX_OBSERVERS>
 {
 public:
@@ -25,8 +23,6 @@ public:
     virtual uint16_t sendCommand(uint16_t command) = 0;
 
     virtual bool getTelemetry(TelemetryField& telemetry) = 0;
-
-
 };
 
 }  // end namespace DShot::Drivers

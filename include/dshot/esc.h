@@ -21,7 +21,6 @@
 #include "drivers/pio_sm.h"
 
 namespace DShot {
-  
 
 // todo: Encoder/Decoder should by parent classes, with type/poles/etc protected
 class ESC  {
@@ -29,8 +28,8 @@ class ESC  {
   ESC (uint dshot_gpio, PIO pio = pio0, 
                Type type = Type::Bidir, 
                Speed speed = Speed::DS300, 
-               unsigned int poles = 14 )
-    : dshot_gpio(dshot_gpio), pio(pio), speed(speed), type(type), encoder(type), decoder(poles) {}
+               unsigned int poles = 14 )  //todo: why does encoder need type again?
+    : driver(dshot_gpio, pio, type, speed), encoder(type), decoder(poles) {}
 
   // Todo: move internals to PIOWrapper class: Init PIO, but do not output data yet
   bool init();
@@ -51,14 +50,7 @@ class ESC  {
 
  private:
 
-  // todo: Also move the PIO layer to its own DShot::PIO(gpio, pio, bidir, speed) class
-  uint dshot_gpio;
-  PIO pio;
-  uint pio_offset;
-
-  int pio_sm = -1;
-  const Speed speed;
-  const Type type;
+  Drivers::Pio_SM driver;
   Encoder encoder;
   Decoder decoder;
 };

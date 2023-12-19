@@ -28,57 +28,11 @@
 namespace DShot {
 
 bool ESC::init() {
-  pio_sm = pio_claim_unused_sm(pio, /*required=*/false);
-  if (pio_sm < 0) {
-    return false;
-  }
-  const pio_program_t* dshot_program = nullptr;
-  void (*init_dshot_program)(PIO, uint, uint, uint) = nullptr;
-
-  if (speed == Speed::DS150 && type == Type::Normal) {
-    dshot_program = &dshot_normal_150_program;
-    init_dshot_program = &dshot_normal_150_program_init;
-
-  } else if (speed == Speed::DS300 && type == Type::Normal) {
-    dshot_program = &dshot_normal_300_program;
-    init_dshot_program = &dshot_normal_300_program_init;
-
-  } else if (speed == Speed::DS300 && type == Type::Bidir) {
-    dshot_program = &dshot_bidir_300_program;
-    init_dshot_program = &dshot_bidir_300_program_init;
-    
-  } else if (speed == Speed::DS600 && type == Type::Normal) {
-    dshot_program = &dshot_normal_600_program;
-    init_dshot_program = &dshot_normal_600_program_init;
-    
-  } else if (speed == Speed::DS600 && type == Type::Bidir) {
-    dshot_program = &dshot_bidir_600_program;
-    init_dshot_program = &dshot_bidir_600_program_init;
-    
-  } else if (speed == Speed::DS1200 && type == Type::Normal) {
-    dshot_program = &dshot_normal_1200_program;
-    init_dshot_program = &dshot_normal_1200_program_init;
-    
-  } else {
-    // todo: some error about unsupported combos?
-    return false;
-  }
-
-  if (!pio_loader_add_or_get_offset(pio, dshot_program, &pio_offset)) {
-    pio_sm_unclaim(pio, pio_sm);
-    pio_sm = -1;
-    return false;
-  }
-
-  // call the 
-  (*init_dshot_program)(pio, pio_sm, pio_offset, dshot_gpio);
-  pio_sm_set_enabled(pio, pio_sm, true);
-  return true;
+  return driver.init();
 }
 
 uint16_t ESC::setCommand(uint16_t c) {
-  pio_sm_put(pio, pio_sm, encoder.encode(c));
-  return c;
+  return driver.sendCommand(encoder.encode(c));
 }
 
 uint16_t ESC::setThrottle(double t) {
@@ -92,15 +46,7 @@ uint16_t ESC::setThrottle(double t) {
 }
 
 int ESC::getRawTelemetry(uint64_t& raw_telemetry) {
-  if (type == Type::Normal) return false;
-
-  int fifo_words = pio_sm_get_rx_fifo_level(pio, pio_sm);
-  if ( fifo_words >= 2) {
-    raw_telemetry = (uint64_t)pio_sm_get_blocking(pio, pio_sm) << 32;
-    raw_telemetry |= (uint64_t)pio_sm_get_blocking(pio, pio_sm);
-    return true;
-  }
-  return false;
+  return driver.getRawTelemetry(raw_telemetry);
 }
 
 bool ESC::decodeTelemetry(uint64_t& raw_telemetry, Telemetry& telemetry) {

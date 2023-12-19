@@ -19,6 +19,19 @@ namespace DShot {
     static constexpr uint8_t DSHOT_EXT_TELEMETRY_VOLTAGE = 0x04;
     static constexpr uint8_t DSHOT_EXT_TELEMETRY_CURRENT = 0x06;
 
+    enum class TelemetryType {  // todo: name datatype uint8_t
+        ERPM = 0x00,  /* not technically the "right" ID, but it works */
+        Temperature = 0x02,
+        Voltage = 0x04,
+        Current = 0x06,
+        /* todo: others? */
+    };
+
+    typedef struct TelemetryField {
+        TelemetryType type;
+        uint16_t data;
+    } TelemetryField;
+
     enum class Speed {
         DS150 = 0,
         DS300 = 1,
