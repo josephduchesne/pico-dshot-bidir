@@ -17,12 +17,12 @@
 #include "hardware/pio.h"
 
 #include "pico_pio_loader/pico_pio_loader.h"
-#include "dshot/pio/dshot_normal_150.pio.h"
-#include "dshot/pio/dshot_normal_300.pio.h"
-#include "dshot/pio/dshot_bidir_300.pio.h"
-#include "dshot/pio/dshot_normal_600.pio.h"
-#include "dshot/pio/dshot_bidir_600.pio.h"
-#include "dshot/pio/dshot_normal_1200.pio.h"
+#include "dshot/drivers/pio/dshot_normal_150.pio.h"
+#include "dshot/drivers/pio/dshot_normal_300.pio.h"
+#include "dshot/drivers/pio/dshot_bidir_300.pio.h"
+#include "dshot/drivers/pio/dshot_normal_600.pio.h"
+#include "dshot/drivers/pio/dshot_bidir_600.pio.h"
+#include "dshot/drivers/pio/dshot_normal_1200.pio.h"
 #include "dshot/esc.h"
 
 namespace DShot {

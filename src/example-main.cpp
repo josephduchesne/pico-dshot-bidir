@@ -31,7 +31,7 @@ void loop() {
   //print_bin(dshot.setCommand(1046));
   if (millis()< 3000) dshot.setCommand(0);  // 1046 is the example command
   else if (millis() < 4000) dshot.setCommand(13);  // extended telemetry enable
-  else dshot.setThrottle(0.25); // https://github.com/betaflight/betaflight/issues/2879
+  else dshot.setThrottle(0.05); // https://github.com/betaflight/betaflight/issues/2879
   delay(1);  // wait for dshot PIO to be done
   uint64_t raw_telemetry;
   if (dshot.getRawTelemetry(raw_telemetry)) {
