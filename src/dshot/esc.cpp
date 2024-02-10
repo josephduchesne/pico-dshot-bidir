@@ -24,7 +24,7 @@
 #include "dshot/pio/dshot_bidir_600.pio.h"
 #include "dshot/pio/dshot_normal_1200.pio.h"
 #include "dshot/esc.h"
-
+#include "dshot/isr.h"
 
 namespace DShot {
 
@@ -76,6 +76,8 @@ bool ESC::init() {
   // save a pointer to this lookup
   ESC::sm_to_esc[pio_sm] = this;
 
+  SetupDShotISR();
+
   // call the init fn
   (*init_dshot_program)(pio, pio_sm, pio_offset, dshot_gpio);
   pio_sm_set_enabled(pio, pio_sm, true);
@@ -106,12 +108,33 @@ int ESC::getRawTelemetry(uint64_t& raw_telemetry) {
     raw_telemetry |= (uint64_t)pio_sm_get_blocking(pio, pio_sm);
     return true;
   } else {
-    Serial.printf("fifow: %d\n", fifo_words);
+    Serial2.printf("fifow: %d\n", fifo_words);
   }
   return false;
 }
 
-bool ESC::decodeTelemetry(uint64_t& raw_telemetry, Telemetry& telemetry) {
+void ESC::processTelemetryQueue() {
+  RawTelemetry rt;
+  uint8_t decoded = 0;
+  uint8_t errored = 0;
+  while(telemetry_queue.pop(rt)) {
+    if (DShot::ESC::sm_to_esc[rt.sm] != nullptr) {
+      if (DShot::ESC::sm_to_esc[rt.sm]->decodeTelemetry(rt.telemetry)) {
+        DShot::Telemetry& telemetry = DShot::ESC::sm_to_esc[rt.sm]->telemetry;
+        
+        if (telemetry.reads % 1000 == 0) {
+          telemetry.errors = 0;
+          telemetry.reads = 0;
+        }
+        decoded++;
+      } else {
+        errored++;
+      }
+    }
+  }
+}
+
+bool ESC::decodeTelemetry(uint64_t& raw_telemetry) {
   return decoder.decodeTelemetry(raw_telemetry, telemetry);
 }
 

@@ -43,7 +43,9 @@ class ESC  {
   void setStop();
   
   int getRawTelemetry(uint64_t& raw_telemetry);  // get the currently raw telemetry results, true if there are some
-  bool decodeTelemetry(uint64_t& raw_telemetry, Telemetry& telemetry);
+  bool decodeTelemetry(uint64_t& raw_telemetry);
+
+  static void processTelemetryQueue();
 
   static ESC* sm_to_esc[4];
   Telemetry telemetry = {0}; // todo: use?

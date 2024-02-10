@@ -10,7 +10,8 @@
             "includePath": [
                 "c:/Users/josep_000/Documents/GitHub/pico-dshot-bidir/include",
                 "c:/Users/josep_000/Documents/GitHub/pico-dshot-bidir/src",
-                "c:/Users/josep_000/Documents/GitHub/pico-dshot-bidir/.pio/libdeps/demo_xiao_rp2040/RPI_PICO_TimerInterrupt/src",
+                "c:/Users/josep_000/Documents/GitHub/pico-dshot-bidir/.pio/libdeps/demo_xiao_rp2040/Embedded Template Library/include",
+                "c:/Users/josep_000/Documents/GitHub/pico-dshot-bidir/.pio/libdeps/demo_xiao_rp2040/Embedded Template Library",
                 "c:/Users/josep_000/Documents/GitHub/pico-dshot-bidir/.pio/libdeps/demo_xiao_rp2040/pico-pio-loader/include",
                 "c:/Users/josep_000/Documents/GitHub/pico-dshot-bidir/.pio/libdeps/demo_xiao_rp2040/pico-pio-loader/src",
                 "C:/Users/josep_000/.platformio/packages/framework-arduinopico/cores/rp2040",
@@ -138,7 +139,8 @@
                 "path": [
                     "c:/Users/josep_000/Documents/GitHub/pico-dshot-bidir/include",
                     "c:/Users/josep_000/Documents/GitHub/pico-dshot-bidir/src",
-                    "c:/Users/josep_000/Documents/GitHub/pico-dshot-bidir/.pio/libdeps/demo_xiao_rp2040/RPI_PICO_TimerInterrupt/src",
+                    "c:/Users/josep_000/Documents/GitHub/pico-dshot-bidir/.pio/libdeps/demo_xiao_rp2040/Embedded Template Library/include",
+                    "c:/Users/josep_000/Documents/GitHub/pico-dshot-bidir/.pio/libdeps/demo_xiao_rp2040/Embedded Template Library",
                     "c:/Users/josep_000/Documents/GitHub/pico-dshot-bidir/.pio/libdeps/demo_xiao_rp2040/pico-pio-loader/include",
                     "c:/Users/josep_000/Documents/GitHub/pico-dshot-bidir/.pio/libdeps/demo_xiao_rp2040/pico-pio-loader/src",
                     "C:/Users/josep_000/.platformio/packages/framework-arduinopico/cores/rp2040",

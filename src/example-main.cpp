@@ -20,12 +20,8 @@ void setup() {
 }
 
 // the loop routine runs over and over again forever:
-// todo: remove telemetry from here, include in dshot class
-DShot::Telemetry telemetry = {0};
 void loop() {
   
-  //if (init_result) Serial.println("Dshot init success");
-  //else Serial.println("DShot init failed");
   delay(2);
   //Serial.print("dshot: ");
   //print_bin(dshot.setCommand(1046));
@@ -33,26 +29,12 @@ void loop() {
   else if (millis() < 4000) dshot.setCommand(13);  // extended telemetry enable
   else dshot.setThrottle(0.25); // https://github.com/betaflight/betaflight/issues/2879
   delay(1);  // wait for dshot PIO to be done
-  uint64_t raw_telemetry;
-  if (dshot.getRawTelemetry(raw_telemetry)) {
-    //Serial.print("Tel: ");
-    //print_bin(raw_telemetry);
-    dshot.decodeTelemetry(raw_telemetry, telemetry);
-    Serial.print(telemetry.rpm);
-    Serial.print(", ");
-    Serial.print(telemetry.temperature_C);
-    Serial.print(", ");
-    Serial.print(telemetry.volts_cV/100); Serial.print("."); Serial.print(telemetry.volts_cV%100);
-    Serial.print(", ");
-    Serial.print(telemetry.amps_A);
-    Serial.print(", ");
-    Serial.print((float)telemetry.errors*100.0f/telemetry.reads, 3); Serial.println("");
-    if (telemetry.reads % 1000 == 0) {
-      telemetry.errors = 0;
-      telemetry.reads = 0;
-    }
-  } else {
-    Serial.println("No telemetry :(");
-  }
+  
+  DShot::ESC::processTelemetryQueue();
+
+  DShot::Telemetry& telemetry = dshot.telemetry;
+  Serial.printf("%drpm, %dC, %02d.%02dV, %dA %0.3f\n", telemetry.rpm, telemetry.temperature_C, 
+                              telemetry.volts_cV/100, telemetry.volts_cV%100, telemetry.amps_A, 
+                              (float)telemetry.errors*100.0f/telemetry.reads);
 
 }
