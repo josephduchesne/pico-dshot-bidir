@@ -72,8 +72,8 @@ read_next32:
 	jmp y--, read_next32   ; read next bit (if we're still reading bits)
 	
 	push  ; emit the input shift register containing the second 32 samples, clearing the input shift register
-	jmp start_frame  ; and go back to the main loop to wait for the next output value
-  ; todo: probably could just use wrap loop to return to start, saving an instruction here
+  irq set 0 rel ; set the IRQ
+	; jmp start_frame  ; and go back to the main loop to wait for the next output value. Not needed due to wrap.
 
 
 % c-sdk {
@@ -88,7 +88,7 @@ static inline void dshot_bidir_600_program_init(PIO pio, uint sm, uint offset, u
     gpio_set_pulls(pin, true, false);  // up, down
 
   
-    sm_config_set_out_shift(&c, false, false, 32);   // auto-pull enabled
+    sm_config_set_out_shift(&c, false, false, 32);   // auto-pull disabled
     sm_config_set_in_shift(&c, false, false, 32);
 
     double clocks_per_us = clock_get_hz(clk_sys) / 1000000;

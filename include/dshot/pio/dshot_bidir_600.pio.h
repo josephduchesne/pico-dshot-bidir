@@ -50,7 +50,7 @@ static const uint16_t dshot_bidir_600_program_instructions[] = {
     0x4a01, // 28: in     pins, 1                [10]
     0x009c, // 29: jmp    y--, 28                    
     0x8020, // 30: push   block                      
-    0x0000, // 31: jmp    0                          
+    0xc010, // 31: irq    nowait 0 rel               
             //     .wrap
 };
 
@@ -75,7 +75,7 @@ static inline void dshot_bidir_600_program_init(PIO pio, uint sm, uint offset, u
     pio_gpio_init(pio, pin);
     pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
     gpio_set_pulls(pin, true, false);  // up, down
-    sm_config_set_out_shift(&c, false, false, 32);   // auto-pull enabled
+    sm_config_set_out_shift(&c, false, false, 32);   // auto-pull disabled
     sm_config_set_in_shift(&c, false, false, 32);
     double clocks_per_us = clock_get_hz(clk_sys) / 1000000;
     // 1.667us per bit for dshot600

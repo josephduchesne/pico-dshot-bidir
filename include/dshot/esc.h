@@ -45,9 +45,9 @@ class ESC  {
   int getRawTelemetry(uint64_t& raw_telemetry);  // get the currently raw telemetry results, true if there are some
   bool decodeTelemetry(uint64_t& raw_telemetry, Telemetry& telemetry);
 
-
+  static ESC* sm_to_esc[4];
   Telemetry telemetry = {0}; // todo: use?
-
+  int pio_sm = -1;
  private:
 
   // todo: Also move the PIO layer to its own DShot::PIO(gpio, pio, bidir, speed) class
@@ -55,7 +55,6 @@ class ESC  {
   PIO pio;
   uint pio_offset;
 
-  int pio_sm = -1;
   const Speed speed;
   const Type type;
   Encoder encoder;

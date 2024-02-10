@@ -1,0 +1,16 @@
+{
+  "name": "PicoDshotBidir",
+  "version": "0.1.0",
+  "description": "Slightly modified version of Arduino_LSM6DS3",
+  "keywords": "dshot",
+  "license": "MIT",
+  "frameworks": "arduino",
+  "platforms": "raspberrypi",
+  "build": {
+    "srcFilter": "-<*> +<dshot/*>"
+  },
+  "dependencies": {
+    "pico-pio-loader": "https://github.com/josephduchesne/pico-pio-loader.git",
+    "RPI_PICO_TimerInterrupt": "khoih-prog/RPI_PICO_TimerInterrupt@^1.3.1"
+  }
+}

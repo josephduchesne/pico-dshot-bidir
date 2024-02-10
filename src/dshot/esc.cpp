@@ -25,7 +25,10 @@
 #include "dshot/pio/dshot_normal_1200.pio.h"
 #include "dshot/esc.h"
 
+
 namespace DShot {
+
+ESC* ESC::sm_to_esc[4] = {nullptr, nullptr, nullptr, nullptr};
 
 bool ESC::init() {
   pio_sm = pio_claim_unused_sm(pio, /*required=*/false);
@@ -70,7 +73,10 @@ bool ESC::init() {
     return false;
   }
 
-  // call the 
+  // save a pointer to this lookup
+  ESC::sm_to_esc[pio_sm] = this;
+
+  // call the init fn
   (*init_dshot_program)(pio, pio_sm, pio_offset, dshot_gpio);
   pio_sm_set_enabled(pio, pio_sm, true);
   return true;
@@ -99,6 +105,8 @@ int ESC::getRawTelemetry(uint64_t& raw_telemetry) {
     raw_telemetry = (uint64_t)pio_sm_get_blocking(pio, pio_sm) << 32;
     raw_telemetry |= (uint64_t)pio_sm_get_blocking(pio, pio_sm);
     return true;
+  } else {
+    Serial.printf("fifow: %d\n", fifo_words);
   }
   return false;
 }

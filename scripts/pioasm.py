@@ -23,15 +23,17 @@ for root, dirs, files in os.walk(env["PROJECT_INCLUDE_DIR"]):
 if PIO_FILES:
     print("==============================================")
     print('PIO ASSEMBLY COMPILER')
+    PIOASM_DIR = None
     try:
-        PIOASM_DIR = platform.get_package_dir("tool-pioasm-rp2040-earlephilhower")
+        PIOASM_DIR = DefaultEnvironment().PioPlatform().get_package_dir("tool-rp2040tools")
+        print(PIOASM_DIR)
     except:
         print("tool-pioasm-rp2040-earlephilhower not found!")
         print("please install it using the following command:")
         print("pio pkg install -g --tool \"earlephilhower/tool-pioasm-rp2040-earlephilhower@^5.100300.220714\"")
         sys.exit()
 
-    PIOASM_EXE = join(PIOASM_DIR, "pioasm")
+    PIOASM_EXE = join(PIOASM_DIR, os.pardir, "tool-pioasm-rp2040-earlephilhower", "pioasm")
     print("pio files found:")
     for filename in PIO_FILES:
         env.Execute(PIOASM_EXE + f' -o c-sdk {filename} {filename}.h')
