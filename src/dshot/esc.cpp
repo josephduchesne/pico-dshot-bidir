@@ -11,6 +11,7 @@
  */
 
 #include <stdint.h>
+#include <Arduino.h>
 
 #include "pico/stdlib.h"
 #include "hardware/clocks.h"
@@ -89,7 +90,7 @@ uint16_t ESC::setCommand(uint16_t c) {
   return c;
 }
 
-uint16_t ESC::setThrottle(double t) {
+uint16_t ESC::setThrottle(float t) {
   if (t < 0) t = 0;
   if (t > 1) t = 1;
 
@@ -98,6 +99,27 @@ uint16_t ESC::setThrottle(double t) {
   if (c > MAX_THROTTLE_COMMAND) c = MAX_THROTTLE_COMMAND;
   return setCommand(c);
 }
+
+uint16_t ESC::setThrottle3D(float t){ // Set the throttle in range [-1, 1]
+  if (t < -1) t = -1;
+  if (t > 1) t = 1;
+
+  // todo: zero blanking ms from QueenBee?
+  // todo: motor direction?
+
+  uint16_t output = 0;
+  if (t == 0) {
+    output = 0;
+  } else if (t<0) {
+    t = -t;
+    output = constrain(MID_THROTTLE_COMMAND+(uint16_t)(t*(float)(MAX_THROTTLE_COMMAND-MID_THROTTLE_COMMAND)), MID_THROTTLE_COMMAND, MAX_THROTTLE_COMMAND);
+  } else {
+    output = constrain(MIN_THROTTLE_COMMAND+(uint16_t)(t*(float)(MID_THROTTLE_COMMAND-1-MIN_THROTTLE_COMMAND)), MIN_THROTTLE_COMMAND, MID_THROTTLE_COMMAND-1);
+  }
+
+  return setCommand(output);
+}
+
 
 int ESC::getRawTelemetry(uint64_t& raw_telemetry) {
   if (type == Type::Normal) return false;

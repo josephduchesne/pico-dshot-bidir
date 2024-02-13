@@ -37,9 +37,9 @@ class ESC  {
   // Set commands trigger once, and must be re-triggered at >= ~200Hz to work
   uint16_t setCommand(uint16_t c); // Set the DShot command value
   // uint16_t setThrottleServo(uint16_t t); // Set thottle in range [1000, 2000] (servo pwm)
-  // uint16_t setThrottle3D(double t); // Set the throttle in range [-1, 1]
+  uint16_t setThrottle3D(float t); // Set the throttle in range [-1, 1]
   // uint16_t setThrottleServo3D(int16_t t); // Throttle range [1000, 2000], 1500 is 0 if ESC is 3d
-  uint16_t setThrottle(double t);  // Set the throttle in range [0, 1]
+  uint16_t setThrottle(float t);  // Set the throttle in range [0, 1]
   void setStop();
   
   int getRawTelemetry(uint64_t& raw_telemetry);  // get the currently raw telemetry results, true if there are some

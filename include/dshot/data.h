@@ -6,6 +6,7 @@ namespace DShot {
 
     // throttle mapping constants
     static constexpr uint16_t MIN_THROTTLE_COMMAND = 48;
+    static constexpr uint16_t MID_THROTTLE_COMMAND = 1048;
     static constexpr uint16_t MAX_THROTTLE_COMMAND = 2047;
     // todo: also handle 3D commands
     // todo: also handle 0 properly as per betaflight post
