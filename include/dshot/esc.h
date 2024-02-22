@@ -25,11 +25,22 @@ namespace DShot {
 // todo: Encoder/Decoder should by parent classes, with type/poles/etc protected
 class ESC  {
  public:
+ /**
+  * @brief Construct a new ESC object
+  * 
+  * @param dshot_gpio 
+  * @param pio 
+  * @param type 
+  * @param speed 
+  * @param poles    Default 14. Allows calculation of RPM from eRPM.
+  * @param scale    Set the max scale (default 1.0)/ 0.5 will treat 100% throttle input as 50% throttle output
+  * @param reversed Reverse the default direction (only affects setThrottle3D)
+  */
   ESC (uint dshot_gpio, PIO pio = pio0, 
                Type type = Type::Bidir, 
                Speed speed = Speed::DS300, 
-               unsigned int poles = 14 )
-    : dshot_gpio(dshot_gpio), pio(pio), speed(speed), type(type), encoder(type), decoder(poles) {}
+               unsigned int poles = 14, float scale = 1.0, bool reversed = false )
+    : dshot_gpio(dshot_gpio), pio(pio), speed(speed), type(type), encoder(type), decoder(poles), scale(scale), reversed(reversed) {}
 
   // Todo: move internals to PIOWrapper class: Init PIO, but do not output data yet
   bool init();
@@ -57,6 +68,8 @@ class ESC  {
   PIO pio;
   uint pio_offset;
 
+  const bool reversed;
+  const float scale;
   const Speed speed;
   const Type type;
   Encoder encoder;

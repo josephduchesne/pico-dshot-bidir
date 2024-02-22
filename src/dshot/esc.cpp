@@ -91,8 +91,10 @@ uint16_t ESC::setCommand(uint16_t c) {
 }
 
 uint16_t ESC::setThrottle(float t) {
-  if (t < 0) t = 0;
-  if (t > 1) t = 1;
+  t *= scale;
+  if (t < 0) t = 0.0f;
+  if (t > 1) t = 1.0f;
+  if (reversed) t = 1.0f-t;
 
   uint16_t c = MIN_THROTTLE_COMMAND + t * (MAX_THROTTLE_COMMAND - MIN_THROTTLE_COMMAND);
   if (c < MIN_THROTTLE_COMMAND) c = MIN_THROTTLE_COMMAND;
@@ -101,8 +103,10 @@ uint16_t ESC::setThrottle(float t) {
 }
 
 uint16_t ESC::setThrottle3D(float t){ // Set the throttle in range [-1, 1]
-  if (t < -1) t = -1;
-  if (t > 1) t = 1;
+  t *= scale;
+  if (t < -1) t = -1.0f;
+  if (t > 1) t = 1.0f;
+  if (reversed) t *= -1;
 
   // todo: zero blanking ms from QueenBee?
   // todo: motor direction?
