@@ -86,6 +86,7 @@ bool ESC::init() {
 }
 
 uint16_t ESC::setCommand(uint16_t c) {
+  output = c;
   pio_sm_put(pio, pio_sm, encoder.encode(c));
   return c;
 }
@@ -102,6 +103,20 @@ uint16_t ESC::setThrottle(float t) {
   return setCommand(c);
 }
 
+uint16_t ESC::convertThrottle3D(float t) { // Convert throttle in range [-1, 1] where 0 is stopped to dshot
+  uint16_t output = 0;
+  if (t < 0.001f && t>-0.001f) {
+    output = 0;
+  } else if (t<0) {
+    t = -t;
+    // the 0.4999 handles the weird rounding issues caused by the range being 999 in this direction, and 1000 in the other direction
+    output = constrain(MID_THROTTLE_COMMAND+(uint16_t)(0.4999f+t*(float)(MAX_THROTTLE_COMMAND-MID_THROTTLE_COMMAND)), MID_THROTTLE_COMMAND+1, MAX_THROTTLE_COMMAND);
+  } else {
+    output = constrain(MIN_THROTTLE_COMMAND-1+(uint16_t)(t*(float)(MID_THROTTLE_COMMAND-MIN_THROTTLE_COMMAND)), MIN_THROTTLE_COMMAND, MID_THROTTLE_COMMAND-1);
+  }
+  return output;
+}
+
 uint16_t ESC::setThrottle3D(float t){ // Set the throttle in range [-1, 1]
   t *= scale;
   if (t < -1) t = -1.0f;
@@ -111,17 +126,7 @@ uint16_t ESC::setThrottle3D(float t){ // Set the throttle in range [-1, 1]
   // todo: zero blanking ms from QueenBee?
   // todo: motor direction?
 
-  uint16_t output = 0;
-  if (t == 0) {
-    output = 0;
-  } else if (t<0) {
-    t = -t;
-    output = constrain(MID_THROTTLE_COMMAND+(uint16_t)(t*(float)(MAX_THROTTLE_COMMAND-MID_THROTTLE_COMMAND)), MID_THROTTLE_COMMAND, MAX_THROTTLE_COMMAND);
-  } else {
-    output = constrain(MIN_THROTTLE_COMMAND+(uint16_t)(t*(float)(MID_THROTTLE_COMMAND-1-MIN_THROTTLE_COMMAND)), MIN_THROTTLE_COMMAND, MID_THROTTLE_COMMAND-1);
-  }
-
-  return setCommand(output);
+  return setCommand(ESC::convertThrottle3D(t));
 }
 
 

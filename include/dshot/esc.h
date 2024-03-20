@@ -48,6 +48,8 @@ class ESC  {
   // Set commands trigger once, and must be re-triggered at >= ~200Hz to work
   uint16_t setCommand(uint16_t c); // Set the DShot command value
   // uint16_t setThrottleServo(uint16_t t); // Set thottle in range [1000, 2000] (servo pwm)
+
+  static uint16_t convertThrottle3D(float t); // Convert throttle in range [-1, 1] where 0 is stopped to dshot
   uint16_t setThrottle3D(float t); // Set the throttle in range [-1, 1]
   // uint16_t setThrottleServo3D(int16_t t); // Throttle range [1000, 2000], 1500 is 0 if ESC is 3d
   uint16_t setThrottle(float t);  // Set the throttle in range [0, 1]
@@ -61,6 +63,7 @@ class ESC  {
   static ESC* sm_to_esc[4];
   Telemetry telemetry = {0}; // todo: use?
   int pio_sm = -1;
+  uint16_t output = 0;
  private:
 
   // todo: Also move the PIO layer to its own DShot::PIO(gpio, pio, bidir, speed) class
