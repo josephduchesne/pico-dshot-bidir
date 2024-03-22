@@ -109,8 +109,7 @@ uint16_t ESC::convertThrottle3D(float t) { // Convert throttle in range [-1, 1] 
     output = 0;
   } else if (t<0) {
     t = -t;
-    // the 0.4999 handles the weird rounding issues caused by the range being 999 in this direction, and 1000 in the other direction
-    output = constrain(MID_THROTTLE_COMMAND+(uint16_t)(0.4999f+t*(float)(MAX_THROTTLE_COMMAND-MID_THROTTLE_COMMAND)), MID_THROTTLE_COMMAND+1, MAX_THROTTLE_COMMAND);
+    output = constrain(MID_THROTTLE_COMMAND-1+(uint16_t)(t*(float)(MAX_THROTTLE_COMMAND-MID_THROTTLE_COMMAND+1)), MID_THROTTLE_COMMAND, MAX_THROTTLE_COMMAND);
   } else {
     output = constrain(MIN_THROTTLE_COMMAND-1+(uint16_t)(t*(float)(MID_THROTTLE_COMMAND-MIN_THROTTLE_COMMAND)), MIN_THROTTLE_COMMAND, MID_THROTTLE_COMMAND-1);
   }

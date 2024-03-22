@@ -265,7 +265,7 @@
                 ]
             },
             "defines": [
-                "PLATFORMIO=60113",
+                "PLATFORMIO=60114",
                 "ARDUINO_SEEED_XIAO_RP2040",
                 "ARDUINO_ARCH_RP2040",
                 "USBD_MAX_POWER_MA=250",

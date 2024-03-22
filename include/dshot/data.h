@@ -19,6 +19,10 @@ namespace DShot {
     static constexpr uint8_t DSHOT_EXT_TELEMETRY_TEMPERATURE = 0x02;
     static constexpr uint8_t DSHOT_EXT_TELEMETRY_VOLTAGE = 0x04;
     static constexpr uint8_t DSHOT_EXT_TELEMETRY_CURRENT = 0x06;
+    static constexpr uint8_t DSHOT_EXT_TELEMETRY_DEBUG1 = 0x08;
+    static constexpr uint8_t DSHOT_EXT_TELEMETRY_DEBUG2 = 0x0A;
+    static constexpr uint8_t DSHOT_EXT_TELEMETRY_STRESS = 0x0C;
+    static constexpr uint8_t DSHOT_EXT_TELEMETRY_STATUS = 0x0E;
 
     enum class Speed {
         DS150 = 0,
@@ -38,6 +42,10 @@ namespace DShot {
         uint8_t temperature_C;  // degrees Celcius
         uint16_t volts_cV;  // deci-volts, or V/100
         uint8_t amps_A;       // Amps
+        uint8_t debug1;
+        uint8_t debug2;
+        uint8_t stress;       // 0..255 see https://github.com/bird-sanctuary/extended-dshot-telemetry/blob/main/README.md
+        uint8_t status;       // Bit[7] = alert event, Bit[6] = warning event, Bit[5] = error event, Bit[3-0] - Max. stress level [0-15]
         uint16_t reads;
         uint16_t errors;
     } Telemetry; 

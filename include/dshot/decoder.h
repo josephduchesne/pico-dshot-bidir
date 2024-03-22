@@ -197,17 +197,33 @@ bool decodeTelemetry(const uint64_t& raw_telemetry, DShot::Telemetry& telemetry)
         uint8_t telemetry_value = (result & 0xFF); // bottom 8 bits
         switch(telemetry_type){
             case DSHOT_EXT_TELEMETRY_TEMPERATURE:
-            // Serial.print(" T.Temp: "); Serial.print(telemetry_value); Serial.println("C");
-            telemetry.temperature_C = telemetry_value;
-            break;
+              // Serial.print(" T.Temp: "); Serial.print(telemetry_value); Serial.println("C");
+              telemetry.temperature_C = telemetry_value;
+              break;
             case DSHOT_EXT_TELEMETRY_VOLTAGE:
-            telemetry.volts_cV = (uint16_t)telemetry_value*25;  // comes in as 0.25V/bit
-            // Serial.print(" T.Voltage: "); Serial.print((float)telemetry_value/4.0f, 2); Serial.println("V");
-            break;
+              telemetry.volts_cV = (uint16_t)telemetry_value*25;  // comes in as 0.25V/bit
+              // Serial.print(" T.Voltage: "); Serial.print((float)telemetry_value/4.0f, 2); Serial.println("V");
+              break;
             case DSHOT_EXT_TELEMETRY_CURRENT:
-            telemetry.amps_A = telemetry_value;
-            // Serial.print(" T.Current: "); Serial.print(telemetry_value); Serial.println("A");
-            break;
+              telemetry.amps_A = telemetry_value;
+              // Serial.print(" T.Current: "); Serial.print(telemetry_value); Serial.println("A");
+              break;
+            case DSHOT_EXT_TELEMETRY_DEBUG1:
+              telemetry.debug1 = telemetry_value;
+              // Serial.print(" T.Debug1: "); Serial.println(telemetry_value);
+              break;
+            case DSHOT_EXT_TELEMETRY_DEBUG2:
+              telemetry.debug2 = telemetry_value;
+              // Serial.print(" T.Debug2: "); Serial.println(telemetry_value);
+              break;
+            case DSHOT_EXT_TELEMETRY_STRESS:
+              telemetry.stress = telemetry_value;
+              // Serial.print(" T.Stress: "); Serial.println(telemetry_value);
+              break;
+            case DSHOT_EXT_TELEMETRY_STATUS:
+              telemetry.status = telemetry_value;
+              // Serial.print(" T.Status: "); Serial.println(telemetry_value);
+              break;
             default: 
             //Serial.print(" T.Other: "); Serial.print(telemetry_type, HEX); Serial.print(" val: "); Serial.println(telemetry_value, HEX);
             break;
